@@ -44,4 +44,6 @@ python -m pip install -e .
 sentinel scan http://localhost:8001
 ```
 
+The default CLI output is a human-readable risk summary with evidence and remediation suggestions. Use `sentinel scan --json http://localhost:8001` when another tool needs the complete structured report.
+
 The scanner is deliberately limited to OpenAPI parsing. It does not crawl, use a production database, or implement production authentication/deployment.

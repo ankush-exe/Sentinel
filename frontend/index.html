@@ -24,6 +24,8 @@
     th, td { text-align: left; padding: 15px 12px; border-bottom: 1px solid var(--line); }
     th { color: var(--muted); font: 700 12px ui-monospace, monospace; text-transform: uppercase; }
     .severity { color: var(--accent); font-weight: 700; }
+    .finding-title { font-weight: 700; }
+    .suggestion { color: var(--muted); max-width: 360px; }
     .clean { color: var(--ok); }
     .empty { color: var(--muted); padding: 20px 0; }
     @media (max-width: 640px) { main { width: min(100% - 28px, 1080px); padding: 36px 0; } form { flex-direction: column; } .summary { gap: 20px; } table { font-size: 14px; } }
@@ -40,7 +42,7 @@
   </form>
   <section id="results" hidden>
     <div class="summary"><div class="metric"><strong id="vuln-count">0</strong><span>vulnerabilities</span></div><div class="metric"><strong id="endpoint-count">0</strong><span>endpoints tested</span></div></div>
-    <table><thead><tr><th>Endpoint</th><th>Status</th><th>Severity</th></tr></thead><tbody id="findings"></tbody></table>
+    <table><thead><tr><th>Severity</th><th>Endpoint</th><th>Issue</th><th>Evidence</th><th>Suggestion</th></tr></thead><tbody id="findings"></tbody></table>
   </section>
   <p id="empty" class="empty">No scan run yet.</p>
 </main>
@@ -59,7 +61,7 @@
       const report = payload.report;
       document.querySelector('#vuln-count').textContent = report.vulnerability_count;
       document.querySelector('#endpoint-count').textContent = report.scanned_endpoints;
-      document.querySelector('#findings').innerHTML = report.findings.map((finding) => `<tr><td>${finding.method} ${finding.endpoint}</td><td class="severity">BOLA/IDOR</td><td>${finding.severity}</td></tr>`).join('') || '<tr><td colspan="3" class="clean">No authorization issues found.</td></tr>';
+      document.querySelector('#findings').innerHTML = report.findings.map((finding) => `<tr><td class="severity">${finding.risk}</td><td><strong>${finding.method} ${finding.endpoint}</strong><br><span class="finding-title">${finding.title}</span></td><td>${finding.violating_user} accessed ${finding.owner}'s resource</td><td>${finding.evidence_summary}</td><td class="suggestion">${finding.suggestion}</td></tr>`).join('') || '<tr><td colspan="5" class="clean">No authorization issues found.</td></tr>';
       results.hidden = false; empty.hidden = true;
     } catch (error) { empty.hidden = false; empty.textContent = error.message; }
     button.disabled = false; button.textContent = 'Run Security Test';

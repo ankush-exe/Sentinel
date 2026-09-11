@@ -1,13 +1,14 @@
 from typing import Any
 
 from sentinel_appsec.authorization.diff import AuthorizationObservation
+from sentinel_appsec.validator.remediation import enrich_finding
 
 
 def classify_observation(observation: AuthorizationObservation) -> dict[str, Any] | None:
     owner_response = observation.responses["user_a"]
     non_owner_response = observation.responses["user_b"]
     if owner_response["status_code"] == 200 and non_owner_response["status_code"] == 200:
-        return {
+        return enrich_finding({
             "type": "BOLA/IDOR",
             "severity": "high",
             "endpoint": observation.endpoint.path,
@@ -16,5 +17,5 @@ def classify_observation(observation: AuthorizationObservation) -> dict[str, Any
             "owner": "user_a",
             "violating_user": "user_b",
             "evidence": observation.as_dict(),
-        }
+        })
     return None
