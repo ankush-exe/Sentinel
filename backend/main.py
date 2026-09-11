@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, HttpUrl
 
-from security_engine.scan import scan_target
+from sentinel_appsec.scan import scan_target
 
 app = FastAPI(title="Sentinel Security Scanner")
 REPORTS: dict[str, dict] = {}

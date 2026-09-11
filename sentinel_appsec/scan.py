@@ -2,11 +2,11 @@ from typing import Any
 
 import httpx
 
-from security_engine.authorization.diff import exercise_endpoint
-from security_engine.discovery.openapi import discover_endpoints
-from security_engine.reporter.report import build_report
-from security_engine.regression.generate import generate_regression_test
-from security_engine.validator.classify import classify_observation
+from sentinel_appsec.authorization.diff import exercise_endpoint
+from sentinel_appsec.discovery.openapi import discover_endpoints
+from sentinel_appsec.reporter.report import build_report
+from sentinel_appsec.regression.generate import generate_regression_test
+from sentinel_appsec.validator.classify import classify_observation
 
 
 async def scan_target(target_url: str) -> dict[str, Any]:

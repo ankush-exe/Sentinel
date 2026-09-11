@@ -1,6 +1,6 @@
 from typing import Any
 
-from security_engine.authorization.diff import AuthorizationObservation
+from sentinel_appsec.authorization.diff import AuthorizationObservation
 
 
 def classify_observation(observation: AuthorizationObservation) -> dict[str, Any] | None:

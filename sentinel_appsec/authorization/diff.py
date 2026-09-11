@@ -3,7 +3,7 @@ from typing import Any
 
 import httpx
 
-from security_engine.discovery.openapi import DiscoveredEndpoint
+from sentinel_appsec.discovery.openapi import DiscoveredEndpoint
 
 TOKENS = {"user_a": "token-user-a", "user_b": "token-user-b", "admin": "token-admin"}
 
