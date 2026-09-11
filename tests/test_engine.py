@@ -5,11 +5,19 @@ from demo_app.main import app
 from sentinel_appsec.discovery.openapi import discover_endpoints
 from sentinel_appsec.validator.classify import classify_observation
 from sentinel_appsec import Scanner
+from sentinel_appsec.cli import run_scan
 
 
 def test_scanner_rejects_non_positive_timeout():
     with pytest.raises(ValueError, match="timeout"):
         Scanner(timeout=0)
+
+
+def test_cli_returns_error_for_unreachable_target(capsys):
+    exit_code = run_scan("http://127.0.0.1:1")
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "scan failed" in captured.err
 
 
 def test_discovery_only_returns_authenticated_path_parameter_routes():

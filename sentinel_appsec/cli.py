@@ -1,8 +1,21 @@
 import argparse
 import asyncio
 import json
+import sys
+
+import httpx
 
 from sentinel_appsec.scan import scan_target
+
+
+def run_scan(url: str) -> int:
+    try:
+        report = asyncio.run(scan_target(url))
+    except (httpx.HTTPError, ValueError) as exc:
+        print(f"sentinel: scan failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(report, indent=2))
+    return 0
 
 
 def main() -> None:
@@ -13,5 +26,4 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "scan":
-        report = asyncio.run(scan_target(args.url))
-        print(json.dumps(report, indent=2))
+        raise SystemExit(run_scan(args.url))
