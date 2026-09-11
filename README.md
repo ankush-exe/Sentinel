@@ -2,6 +2,8 @@
 
 Sentinel is a small security-testing demo that discovers authenticated path-parameter endpoints from OpenAPI, replays each resource request as three roles, and reports broken object-level authorization (BOLA/IDOR).
 
+The reusable package is exposed as `sentinel_appsec`, with a `sentinel scan <url>` command.
+
 ## 30-second demo
 
 ```bash
@@ -35,4 +37,11 @@ The vulnerable demo routes intentionally omit ownership checks. The `/owner` rou
 pytest -q
 ```
 
-The scanner is deliberately limited to OpenAPI parsing. It does not crawl, package for PyPI, provide a CLI, use a production database, or implement production authentication/deployment.
+## Package usage
+
+```bash
+python -m pip install -e .
+sentinel scan http://localhost:8001
+```
+
+The scanner is deliberately limited to OpenAPI parsing. It does not crawl, use a production database, or implement production authentication/deployment.
