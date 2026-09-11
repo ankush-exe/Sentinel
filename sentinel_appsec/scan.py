@@ -9,9 +9,9 @@ from sentinel_appsec.regression.generate import generate_regression_test
 from sentinel_appsec.validator.classify import classify_observation
 
 
-async def scan_target(target_url: str) -> dict[str, Any]:
+async def scan_target(target_url: str, timeout: float = 10.0) -> dict[str, Any]:
     base_url = target_url.rstrip("/")
-    async with httpx.AsyncClient(base_url=base_url, timeout=10.0) as client:
+    async with httpx.AsyncClient(base_url=base_url, timeout=timeout) as client:
         spec_response = await client.get("/openapi.json")
         spec_response.raise_for_status()
         endpoints = discover_endpoints(spec_response.json())
