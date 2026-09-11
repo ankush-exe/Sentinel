@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sentinel Security Test</title>
+  <style>
+    :root { --ink: #172121; --muted: #607070; --paper: #f3f0e8; --accent: #d95d39; --line: #d8d2c5; --ok: #317a5c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: radial-gradient(circle at 10% 0%, #fff9e8, var(--paper) 42%, #e2ebe6); font: 16px/1.5 Georgia, serif; }
+    main { width: min(1080px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0; }
+    .eyebrow { color: var(--accent); font: 700 12px/1.2 ui-monospace, monospace; letter-spacing: 0; text-transform: uppercase; }
+    h1 { max-width: 620px; margin: 10px 0 12px; font-size: clamp(2.6rem, 7vw, 5.6rem); line-height: .92; font-weight: 400; }
+    .intro { max-width: 570px; color: var(--muted); font-size: 1.15rem; }
+    form { display: flex; gap: 10px; margin: 34px 0 45px; max-width: 780px; }
+    input, button { border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; font: inherit; }
+    input { flex: 1; background: #fffdf8; min-width: 0; }
+    button { color: #fffdf8; background: var(--ink); border-color: var(--ink); cursor: pointer; font-weight: 700; }
+    button:hover { background: var(--accent); border-color: var(--accent); }
+    .summary { display: flex; gap: 34px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px 0; margin-bottom: 24px; }
+    .metric strong { display: block; font-size: 2rem; font-weight: 400; }
+    .metric span { color: var(--muted); font: 12px ui-monospace, monospace; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; background: rgba(255, 253, 248, .62); }
+    th, td { text-align: left; padding: 15px 12px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font: 700 12px ui-monospace, monospace; text-transform: uppercase; }
+    .severity { color: var(--accent); font-weight: 700; }
+    .clean { color: var(--ok); }
+    .empty { color: var(--muted); padding: 20px 0; }
+    @media (max-width: 640px) { main { width: min(100% - 28px, 1080px); padding: 36px 0; } form { flex-direction: column; } .summary { gap: 20px; } table { font-size: 14px; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Sentinel / authorization testing</div>
+  <h1>Find the access paths that should not exist.</h1>
+  <p class="intro">Point Sentinel at an OpenAPI-enabled service. It replays resource requests as an owner, a peer, and an administrator, then records authorization drift.</p>
+  <form id="scan-form">
+    <input id="target" type="url" value="http://localhost:8001" aria-label="Target URL" required>
+    <button type="submit">Run Security Test</button>
+  </form>
+  <section id="results" hidden>
+    <div class="summary"><div class="metric"><strong id="vuln-count">0</strong><span>vulnerabilities</span></div><div class="metric"><strong id="endpoint-count">0</strong><span>endpoints tested</span></div></div>
+    <table><thead><tr><th>Endpoint</th><th>Status</th><th>Severity</th></tr></thead><tbody id="findings"></tbody></table>
+  </section>
+  <p id="empty" class="empty">No scan run yet.</p>
+</main>
+<script>
+  const form = document.querySelector('#scan-form');
+  const results = document.querySelector('#results');
+  const empty = document.querySelector('#empty');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('button');
+    button.disabled = true; button.textContent = 'Testing...';
+    try {
+      const response = await fetch('/scan', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({target_url: document.querySelector('#target').value}) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.detail || 'Scan failed');
+      const report = payload.report;
+      document.querySelector('#vuln-count').textContent = report.vulnerability_count;
+      document.querySelector('#endpoint-count').textContent = report.scanned_endpoints;
+      document.querySelector('#findings').innerHTML = report.findings.map((finding) => `<tr><td>${finding.method} ${finding.endpoint}</td><td class="severity">BOLA/IDOR</td><td>${finding.severity}</td></tr>`).join('') || '<tr><td colspan="3" class="clean">No authorization issues found.</td></tr>';
+      results.hidden = false; empty.hidden = true;
+    } catch (error) { empty.hidden = false; empty.textContent = error.message; }
+    button.disabled = false; button.textContent = 'Run Security Test';
+  });
+</script>
+</body>
+</html>
